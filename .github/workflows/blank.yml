@@ -19,9 +19,9 @@ jobs:
 
       - name: get a list of workflow runs 
         run: |
-             echo "getting list of workflow runs.."
-             gh api \
-             /repos/alimelus/github_delete/actions/runs
+             #echo "getting list of workflow runs.."
+             #gh api \
+             #/repos/alimelus/github_delete/actions/runs
 
              curl -X POST \
               -H "Authorization: token $GITHUB_TOKEN" \
