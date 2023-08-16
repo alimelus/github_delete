@@ -23,7 +23,7 @@ jobs:
              #gh api \
              #/repos/alimelus/github_delete/actions/runs
 
-             curl -X POST \
+             curl -X DELETE \
               -H "Authorization: token $GITHUB_TOKEN" \
               -H "Accept: application/vnd.github.v3+json" \
               "https://api.github.com/repos/alimelus/github_delete/actions/runs/5878032657/cancel"
