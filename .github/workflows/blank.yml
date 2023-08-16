@@ -3,9 +3,6 @@ on:
   push:
     branches: [ "main" ]
     
-env:
-    GH_TOKEN: ${{ github.token }}
-
 jobs:
   runid:
       runs-on: ubuntu-latest
@@ -24,7 +21,7 @@ jobs:
              /repos/alimelus/github_delete/actions/runs
 
              curl -X POST \
-              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Authorization: token $workflow" \
               -H "Accept: application/vnd.github.v3+json" \
               "https://api.github.com/repos/alimelus/github_delete/actions/runs/5878032657/cancel"
 
