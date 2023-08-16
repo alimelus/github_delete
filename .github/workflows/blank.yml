@@ -15,12 +15,17 @@ jobs:
 
       - name: Display current Workflow Run ID
         run: |
-            echo "Workflow Run ID: ${{ github.run_id }}"
+            echo " current Workflow Run ID: ${{ github.run_id }}"
 
       - name: get a list of workflow runs 
         run: |
              echo "getting list of workflow runs.."
              gh api \
              /repos/alimelus/github_delete/actions/runs
+
+             curl -X POST \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/alimelus/github_delete/actions/runs/5878032657/cancel"
 
           
