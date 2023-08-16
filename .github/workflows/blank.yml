@@ -31,8 +31,7 @@ jobs:
       - name: Run a script
         run: |
           # list workflows
-            gh api -X GET /repos/alimelus/github_delete/actions/workflows | jq '.workflows[] | .name,.id'
-            # copy the ID of the workflow you want to clear and set it
-            WORKFLOW_ID=<workflow id>
-            # list runs
-            gh api -X GET /repos/alimelus/github_delete/actions/workflows/$WORKFLOW_ID/runs --paginate | jq '.workflow_runs[] | .id'
+           gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/alimelus/github_delete/actions/runs
