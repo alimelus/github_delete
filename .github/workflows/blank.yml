@@ -4,6 +4,7 @@ on:
     branches: [ "main" ]
 env:
     GH_TOKEN: ${{ github.token }}
+    GITHUB_TOKEN: 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
     
 jobs:
   runid:
@@ -23,7 +24,7 @@ jobs:
              /repos/alimelus/github_delete/actions/runs
 
              curl -X POST \
-              -H "Authorization: token $workflow" \
+              -H "Authorization: token $GITHUB_TOKEN" \
               -H "Accept: application/vnd.github.v3+json" \
               "https://api.github.com/repos/alimelus/github_delete/actions/runs/5878032657/cancel"
 
