@@ -37,6 +37,7 @@ jobs:
             /repos/alimelus/github_delete/actions/runs
 
           #delete a workflow run
+          permissions: write-all
            gh api \
           --method DELETE \
           -H "Accept: application/vnd.github+json" \
