@@ -19,7 +19,8 @@ jobs:
 
       - name: Delete Workflow Runs
         run: |
-              curl -X DELETE \
+              curl -L \
+              -X DELETE \
               -H "Authorization: token $GITHUB_TOKEN" \
               "https://api.github.com/repos/$OWNER/$REPO/actions/runs/$RUN_ID"
          
