@@ -1,16 +1,13 @@
-name: Delete Previous Run
+name: Displaying current and previous workflow run id
 
 on:
-  workflow_run:
-    types:
-      - completed
   push:
     branches:
        feature
 env:
   GITHUB_TOKEN: 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
 jobs:
-  delete_previous_run:
+  dispalying_run_id:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
