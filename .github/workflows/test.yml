@@ -13,28 +13,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Fetch Workflow Runs
-        id: fetch-runs
+      
+      - name: Display current Workflow Run ID
         run: |
-          TOKEN="${{ env.GITHUB_TOKEN }}"
-          RUNS=$(curl -s -H "Authorization: token $TOKEN" "https://api.github.com/repos/${{ github.repository }}/actions/runs")
+            echo " current Workflow Run ID: ${{ github.run_id }}"
           
 
-      - name: Extract Previous Run ID
+      - name: Run ID
         id: extract-previous-id
         run: |
           # Use GitHub API to get the list of workflow runs
           response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/actions/runs")
           # Parse JSON response and get the ID of the previous run
-          previous_run_id=$(echo "$response" | jq -r '.workflow_runs[1].id')
+          previous_run_id=$(echo "$response" | jq -r '.workflow_runs[10].id')
           echo "Previous Run ID: $previous_run_id"
          
 
 
-      - name: Delete Previous Run
-        if: ${{ steps.extract-previous-id.outputs.previous-id != null }}
-        run: |
-          TOKEN="${{ env.GITHUB_TOKEN }}"
-          PREVIOUS_ID="${{ steps.extract-previous-id.outputs.previous-id }}"
-          curl -X DELETE -H "Authorization: token $TOKEN" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$PREVIOUS_ID"
+    
