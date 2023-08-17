@@ -11,21 +11,6 @@ env:
     REPO_NAME: github_delete
     
 jobs:
-  runid:
-      runs-on: ubuntu-latest
-      steps:
-          - name: checkout repository
-            uses: actions/checkout@v3
-
-          - name: Delete Workflow Run
-       
-            name: Delete Multiple Workflow Runs
-on:
-  workflow_run:
-    types:
-      - completed
-
-jobs:
   delete_runs:
     runs-on: ubuntu-latest
     steps:
