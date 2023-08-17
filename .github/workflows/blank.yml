@@ -4,6 +4,11 @@ on:
     branches: [ "main" ]
 env:
     GITHUB_TOKEN: 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
+    OWNER: alimelus
+    REPO: github_delete
+    RUN_ID: 5889009749
+
+   
    
 jobs:
   delete_runs:
@@ -14,9 +19,9 @@ jobs:
 
       - name: Delete Workflow Runs
         run: |
-          # Fetch a list of workflow runs
-          RUNS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/actions/runs")
-
+              curl -X DELETE \
+              -H "Authorization: token $TOKEN" \
+              "https://api.github.com/repos/$OWNER/$REPO/actions/runs/$RUN_ID"
          
 
                     
