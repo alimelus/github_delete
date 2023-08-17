@@ -3,7 +3,7 @@ on:
   push:
     branches: [ "main" ]
 env:
-    GH_TOKEN: ${{ github.token }}
+    
     GITHUB_TOKEN: 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
     
 jobs:
@@ -19,13 +19,6 @@ jobs:
           TOKEN="${{ secrets.GITHUB_TOKEN }}"
           RUNS=$(curl -s -H "Authorization: token $TOKEN" "https://api.github.com/repos/${{ github.repository }}/actions/runs")
           echo "::set-output name=runs::$RUNS"
-
-      - name: Extract Previous Run ID
-        id: extract-previous-id
-        run: |
-          RUNS="${{ steps.fetch-runs.outputs.runs }}"
-          PREVIOUS_ID=$(echo "$RUNS" | jq -r '.workflow_runs[1].id')  # Change index as needed
-          echo "::set-output name=previous-id::$PREVIOUS_ID"
 
       - name: Delete Previous Run
         if: ${{ steps.extract-previous-id.outputs.previous-id != null }}
