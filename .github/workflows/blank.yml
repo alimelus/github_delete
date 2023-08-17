@@ -20,11 +20,34 @@ jobs:
           RUNS=$(curl -s -H "Authorization: token $TOKEN" "https://api.github.com/repos/${{ github.repository }}/actions/runs")
           echo "::set-output name=runs::$RUNS"
 
-      - name: Delete Previous Run
-        if: ${{ steps.extract-previous-id.outputs.previous-id != null }}
-        run: |
-          TOKEN="${{ secrets.GITHUB_TOKEN }}"
-          PREVIOUS_ID="${{ steps.extract-previous-id.outputs.previous-id }}"
-          curl -X DELETE -H "Authorization: token $TOKEN" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$PREVIOUS_ID"
-
-          
+            #!/bin/bash
+            
+            # Replace with your GitHub personal access token
+            ACCESS_TOKEN="YOUR_PERSONAL_ACCESS_TOKEN"
+            
+            # Replace with the owner and repository name
+            REPO_OWNER="repository-owner"
+            REPO_NAME="repository-name"
+            
+            # Get the current date
+            CURRENT_DATE=$(date +%Y-%m-%dT%H:%M:%S%z)
+            
+            # Calculate the cutoff date (e.g., runs older than 30 days)
+            CUTOFF_DATE=$(date -d "30 days ago" "+%Y-%m-%dT%H:%M:%S%z")
+            
+            # Fetch a list of workflow runs
+            RUNS=$(curl -s -H "Authorization: token $ACCESS_TOKEN" "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/actions/runs")
+            
+            # Loop through the runs and delete old runs
+            for run in $(echo "$RUNS" | jq -r '.workflow_runs[] | @base64'); do
+                run_json=$(echo "$run" | base64 -d)
+                run_id=$(echo "$run_json" | jq -r '.id')
+                run_created_at=$(echo "$run_json" | jq -r '.created_at')
+            
+                # Compare the run's creation date with the cutoff date
+                if [[ "$run_created_at" < "$CUTOFF_DATE" ]]; then
+                    echo "Deleting workflow run $run_id"
+                    curl -X DELETE -H "Authorization: token $ACCESS_TOKEN" "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/actions/runs/$run_id"
+                fi
+            done
+            
