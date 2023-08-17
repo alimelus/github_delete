@@ -13,30 +13,25 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v3
 
-      - name: Display current Workflow Run ID
+      - name: Fetch Workflow Runs
+        id: fetch-runs
         run: |
-            echo " current Workflow Run ID: ${{ github.run_id }}"
+          TOKEN="${{ secrets.GITHUB_TOKEN }}"
+          RUNS=$(curl -s -H "Authorization: token $TOKEN" "https://api.github.com/repos/${{ github.repository }}/actions/runs")
+          echo "::set-output name=runs::$RUNS"
 
-      - name: Get Previous Run ID
-        id: get_previous_run_id
+      - name: Extract Previous Run ID
+        id: extract-previous-id
         run: |
-          # Use GitHub API to get the list of workflow runs
-          response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/runs")
-          # Parse JSON response and get the ID of the previous run
-          previous_run_id=$(echo "$response" | jq -r '.workflow_runs[1].id')
-          echo "Previous Run ID: $previous_run_id"
-          echo "::set-output name=previous_run_id::$previous_run_id"
+          RUNS="${{ steps.fetch-runs.outputs.runs }}"
+          PREVIOUS_ID=$(echo "$RUNS" | jq -r '.workflow_runs[1].id')  # Change index as needed
+          echo "::set-output name=previous-id::$PREVIOUS_ID"
 
-      - name: get a list of workflow runs 
+      - name: Delete Previous Run
+        if: ${{ steps.extract-previous-id.outputs.previous-id != null }}
         run: |
-             #echo "getting list of workflow runs.."
-             #gh api \
-             #/repos/alimelus/github_delete/actions/runs
-
-             curl --request GET \
-             --url https://https://github.com/alimelus/2023-01/workflows \
-             --header 'Authorization: bearer YOUR_API_KEY' \
-             --header 'accept: application/json'
+          TOKEN="${{ secrets.GITHUB_TOKEN }}"
+          PREVIOUS_ID="${{ steps.extract-previous-id.outputs.previous-id }}"
+          curl -X DELETE -H "Authorization: token $TOKEN" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$PREVIOUS_ID"
 
           
