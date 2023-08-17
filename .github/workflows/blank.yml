@@ -2,7 +2,7 @@ name: CI
 on:
   workflow_run:
     types:
-      - completed
+      - Failure
   push:
     branches: [ "main" ]
 env:
