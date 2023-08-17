@@ -23,9 +23,14 @@ jobs:
       - name: Extract Previous Run ID
         id: extract-previous-id
         run: |
-          RUNS="${{ steps.fetch-runs.outputs.runs }}"
-          PREVIOUS_ID=$(echo "$RUNS" | jq -r '.workflow_runs[1].id') 
-          echo "::set-output name=previous-id::$PREVIOUS_ID"
+          # Use GitHub API to get the list of workflow runs
+          response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs")
+          # Parse JSON response and get the ID of the previous run
+          previous_run_id=$(echo "$response" | jq -r '.workflow_runs[1].id')
+          echo "Previous Run ID: $previous_run_id"
+          echo "::set-output name=previous_run_id::$previous_run_id"
+
 
       - name: Delete Previous Run
         if: ${{ steps.extract-previous-id.outputs.previous-id != null }}
