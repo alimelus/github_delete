@@ -19,13 +19,11 @@ jobs:
 
       - name: Delete Workflow Runs
         run: |
-              curl -s \
-                    -X DELETE \
-                    -H "Accept: application/vnd.github+json" \
-                    -H "Authorization: Bearer $GITHUB_TOKEN"\
-                    -H "X-GitHub-Api-Version: 2022-11-28" \
-                    https://api.github.com/repos/$OWNER/$REPO/actions/runs/$1
-                    echo "Successfully deleted a workflow's run with $1"
-         
+              run_ids=( $(curl -s \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "Authorization: Bearer $GITHUB_TOKEN" \
+                  -H "X-GitHub-Api-Version: 2022-11-28" \
+                 "https://api.github.com/repos/$OWNER/$REPO/actions/runs?per_page=100" | jq -r '.workflow_runs[].id') )
+                   
 
                     
