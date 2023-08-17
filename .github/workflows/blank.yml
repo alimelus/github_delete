@@ -1,8 +1,5 @@
 name: CI
 on:
-  workflow_run:
-    types:
-      - Failure
   push:
     branches: [ "main" ]
 env:
