@@ -24,7 +24,7 @@ jobs:
         id: extract-previous-id
         run: |
           RUNS="${{ steps.fetch-runs.outputs.runs }}"
-          PREVIOUS_ID=$(echo "$RUNS" | jq -r '.workflow_runs[1].id')  # Change index as needed
+          PREVIOUS_ID=$(echo "$RUNS" | jq -r '.workflow_runs[1].id') 
           echo "::set-output name=previous-id::$PREVIOUS_ID"
 
       - name: Delete Previous Run
@@ -32,4 +32,4 @@ jobs:
         run: |
           TOKEN="${{ env.GITHUB_TOKEN }}"
           PREVIOUS_ID="${{ steps.extract-previous-id.outputs.previous-id }}"
-          curl -X DELETE -H "Authorization: token $TOKEN" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$PREVIOUS_ID"
+          curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$PREVIOUS_ID"
