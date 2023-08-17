@@ -3,8 +3,10 @@ on:
   push:
     branches: [ "main" ]
 env:
-    
     GITHUB_TOKEN: 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
+    REPO_OWNER: alimelus
+    REPO_NAME: github_delete
+    
     
 jobs:
   runid:
@@ -16,14 +18,14 @@ jobs:
       - name: Fetch Workflow Runs
         id: fetch-runs
         run: |
-          TOKEN="${{ secrets.GITHUB_TOKEN }}"
+          TOKEN="${{ env.GITHUB_TOKEN }}"
           RUNS=$(curl -s -H "Authorization: token $TOKEN" "https://api.github.com/repos/${{ github.repository }}/actions/runs")
           echo "::set-output name=runs::$RUNS"
 
             #!/bin/bash
             
             # Replace with your GitHub personal access token
-            ACCESS_TOKEN="YOUR_PERSONAL_ACCESS_TOKEN"
+            GITHUB_TOKEN="YOUR_PERSONAL_ACCESS_TOKEN"
             
             # Replace with the owner and repository name
             REPO_OWNER="repository-owner"
@@ -36,7 +38,7 @@ jobs:
             CUTOFF_DATE=$(date -d "30 days ago" "+%Y-%m-%dT%H:%M:%S%z")
             
             # Fetch a list of workflow runs
-            RUNS=$(curl -s -H "Authorization: token $ACCESS_TOKEN" "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/actions/runs")
+            RUNS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/actions/runs")
             
             # Loop through the runs and delete old runs
             for run in $(echo "$RUNS" | jq -r '.workflow_runs[] | @base64'); do
@@ -47,7 +49,7 @@ jobs:
                 # Compare the run's creation date with the cutoff date
                 if [[ "$run_created_at" < "$CUTOFF_DATE" ]]; then
                     echo "Deleting workflow run $run_id"
-                    curl -X DELETE -H "Authorization: token $ACCESS_TOKEN" "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/actions/runs/$run_id"
+                    curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/actions/runs/$run_id"
                 fi
             done
             
