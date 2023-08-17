@@ -1,11 +1,16 @@
 name: CI
 on:
+  workflow_run:
+    types:
+      - completed
   push:
     branches: [ "main" ]
 env:
     GITHUB_TOKEN: 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
     REPO_OWNER: alimelus
     REPO_NAME: github_delete
+
+    
     
     
 jobs:
