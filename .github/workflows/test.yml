@@ -6,6 +6,7 @@ on:
        feature
 env:
   GITHUB_TOKEN: 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
+jobs:
   dispalying_run_id:
     runs-on: ubuntu-latest
     steps:
