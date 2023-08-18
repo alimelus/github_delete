@@ -26,8 +26,8 @@ jobs:
             previous_run_id=$(echo "$response" | jq -r '.workflow_runs[10].id')
             echo "Previous Run ID: $previous_run_id"
             # applying deletion on workflow run id
-            curl -X DELETE \
-            https://api.github.com/repos/alimelus/github_delete/actions/runs/5889374095
+            gh workflow run delete 5889374095
+
 
          
 
