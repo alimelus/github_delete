@@ -5,8 +5,7 @@ on:
     branches:
        feature
 env:
-  GITHUB_TOKEN: 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
-jobs:
+  GITHUB_TOKEN: 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
   dispalying_run_id:
     runs-on: ubuntu-latest
     steps:
