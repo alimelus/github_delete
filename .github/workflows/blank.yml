@@ -24,7 +24,7 @@ jobs:
           
           # Use your tool or API to fetch old run IDs based on the calculated threshold date
           # Replace this with your actual API call
-          OLD_RUN_IDS=$(curl -s -H "Authorization: Bearer ${{ secrets.AUTH_TOKEN }}" "https://api.github.com/workflow_runs?created_before=$THRESHOLD_DATE" | jq -r '.[].id')
+          OLD_RUN_IDS=$(curl -s -H "Authorization: Bearer ${{ secrets.AUTH_TOKEN }}" "https://api.github.com/workflow_runs?created_before=$THRESHOLD_DATE" | jq -r)
 
           # Loop through and delete old run IDs
           for run_id in $OLD_RUN_IDS; do
