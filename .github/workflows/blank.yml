@@ -1,49 +1,36 @@
-name: CI
-on:
-  push:
-    branches: [ "main" ]
-  schedule:
-    - cron: "0 0 * * *" # Run daily
-env:
-    GITHUB_TOKEN: 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
-    OWNER: alimelus
-    REPO: github_delete
-    RUN_ID: 5889009749
+name: Delete Old Workflow Runs
 
+on:
+  workflow_dispatch:
+    inputs:
+      days_ago:
+        description: 'Number of days ago to consider runs as old'
+        required: true
 
 jobs:
-  cleanup:
+  delete_runs:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: List Workflow Runs
-        id: list-runs
+      - name: Delete Old Runs
         run: |
-          # Use the GitHub API to list workflow runs
-          response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/runs")
-          # Parse JSON response and filter runs older than a certain number of days
-          runs_to_cancel=($(echo "$response" | jq -r '.workflow_runs[] | select(.created_at < (now - 60 * 60 * 24 * 7)) | .id'))
-          echo "::set-output name=runs_to_cancel::${runs_to_cancel[*]}"
+          DAYS_AGO=${{ github.event.inputs.days_ago }}
+          
+          # Calculate the date threshold
+          THRESHOLD_DATE=$(date -u -d "$DAYS_AGO days ago" +%Y-%m-%dT%H:%M:%SZ)
+          
+          # Use your tool or API to fetch old run IDs based on the calculated threshold date
+          # Replace this with your actual API call
+          OLD_RUN_IDS=$(curl -s -H "Authorization: Bearer ${{ secrets.AUTH_TOKEN }}" "https://api.github.com/workflow_runs?created_before=$THRESHOLD_DATE" | jq -r '.[].id')
 
-      - name: Cancel Workflow Runs
-        if: steps.list-runs.outputs.runs_to_cancel != ''
-        run: |
-          runs_to_cancel=(${{ steps.list-runs.outputs.runs_to_cancel }})
-          GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
-          OWNER="${{ github.repository_owner }}"
-          NAME="${{ github.repository }}"
-
-          # Loop through runs and cancel each using GitHub API
-          for run_id in "${runs_to_cancel[@]}"; do
-            curl -X POST \
-              -H "Authorization: token $GITHUB_TOKEN" \
-              -H "Accept: application/vnd.github.v3+json" \
-              "https://api.github.com/repos/$OWNER/$REPO/actions/runs/$run_id/cancel"
+          # Loop through and delete old run IDs
+          for run_id in $OLD_RUN_IDS; do
+              echo "Deleting workflow run ID: $run_id"
+              curl -X DELETE -H "Authorization: Bearer ${{ secrets.AUTH_TOKEN }}" "https://api.github.com/workflow_runs/$run_id"
           done
 
-
-                    
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
