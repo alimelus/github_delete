@@ -1,37 +1,59 @@
-name: Delete Old Workflow Runs
-
+name: Delete old workflow runs
 on:
   workflow_dispatch:
     inputs:
-      days_ago:
-        description: 'Number of days ago to consider runs as old'
+      days:
+        description: 'Number of days.'
         required: true
+        default: 30
+      minimum_runs:
+        description: 'The minimum runs to keep for each workflow.'
+        required: true
+        default: 6
+      delete_workflow_pattern:
+        description: 'The name or filename of the workflow. if not set then it will target all workflows.'
+        required: false
+      delete_workflow_by_state_pattern:
+        description: 'Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually'
+        required: true
+        default: "All"
+        type: choice
+        options:
+          - "All"
+          - active
+          - deleted
+          - disabled_inactivity
+          - disabled_manually
+      delete_run_by_conclusion_pattern:
+        description: 'Remove workflow by conclusion: action_required, cancelled, failure, skipped, success'
+        required: true
+        default: "All"
+        type: choice
+        options:
+          - "All"
+          - action_required
+          - cancelled
+          - failure
+          - skipped
+          - success
+      dry_run:
+        description: 'Only log actions, do not perform any delete operations.'
+        required: false
 
 jobs:
-  delete_runs:
+  del_runs:
     runs-on: ubuntu-latest
-
+    permissions:
+      actions: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Delete Old Runs
-        run: |
-          DAYS_AGO=${{ github.event.inputs.days_ago }}
-          
-          # Calculate the date threshold
-          THRESHOLD_DATE=$(date -u -d "$DAYS_AGO days ago" +%Y-%m-%dT%H:%M:%SZ)
-          
-          # Use the GitHub API to fetch a list of workflow runs
-          # Replace this with your actual API call
-          # Ensure to filter by the calculated threshold date
-          RUNS_JSON=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=100&status=completed&event=push")
-
-          # Loop through and delete old workflow run IDs
-          for run_id in $(echo "$RUNS_JSON" | jq -r ".workflow_runs[] | select(.created_at < \"$THRESHOLD_DATE\") | .id"); do
-              echo "Deleting workflow run ID: $run_id"
-              curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
-          done
-          
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: ${{ github.event.inputs.days }}
+          keep_minimum_runs: ${{ github.event.inputs.minimum_runs }}
+          delete_workflow_pattern: ${{ github.event.inputs.delete_workflow_pattern }}
+          delete_workflow_by_state_pattern: ${{ github.event.inputs.delete_workflow_by_state_pattern }}
+          delete_run_by_conclusion_pattern: ${{ github.event.inputs.delete_run_by_conclusion_pattern }}
+          dry_run: ${{ github.event.inputs.dry_run }}
