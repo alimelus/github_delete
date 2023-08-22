@@ -22,15 +22,16 @@ jobs:
           # Calculate the date threshold
           THRESHOLD_DATE=$(date -u -d "$DAYS_AGO days ago" +%Y-%m-%dT%H:%M:%SZ)
           
-          # Use your tool or API to fetch old run IDs based on the calculated threshold date
+          # Use the GitHub API to fetch a list of workflow runs
           # Replace this with your actual API call
-          OLD_RUN_IDS=$(curl -s -H "Authorization: Bearer ${{ secrets.AUTH_TOKEN }}" "https://api.github.com/workflow_runs?created_before=$THRESHOLD_DATE" | jq -r)
+          # Ensure to filter by the calculated threshold date
+          RUNS_JSON=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=100&status=completed&event=push")
 
-          # Loop through and delete old run IDs
-          for run_id in $OLD_RUN_IDS; do
+          # Loop through and delete old workflow run IDs
+          for run_id in $(echo "$RUNS_JSON" | jq -r ".workflow_runs[] | select(.created_at < \"$THRESHOLD_DATE\") | .id"); do
               echo "Deleting workflow run ID: $run_id"
-              curl -X DELETE -H "Authorization: Bearer ${{ secrets.AUTH_TOKEN }}" "https://api.github.com/workflow_runs/$run_id"
+              curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
           done
-
+          
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
