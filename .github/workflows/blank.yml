@@ -1,22 +1,38 @@
-name: delete
+name: Delete Workflow Runs by Date
+
 on:
-  push:
-    branches:
-       hotfix
+  workflow_run:
+    types:
+      - completed
 
 jobs:
-  cleanup:
+  delete-runs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Check out the repository
         uses: actions/checkout@v2
 
-      - name: Delete Workflow Runs
-        id: delete-runs
+      - name: Get Workflow Runs
+        id: get_runs
         run: |
-           # Get the list of workflow runs
-            RUNS=$(curl -s -H "Authorization: token ${{ github.token }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs")
-     
+          TOKEN="${{ secrets.TOKEN }}"
+          REPO="${{ github.repository }}"
+          CREATED_DATE="2023-08-16THH:MM:SSZ"  # Replace with the desired date
 
-                    
+          URL="https://api.github.com/repos/${{ github.repository }}/actions/runs?event=workflow_run&created=$CREATED_DATE"
+
+          echo "::set-output name=URL::$URL"
+          echo "::set-output name=TOKEN::$TOKEN"
+
+      - name: Delete Workflow Run
+        env:
+          TOKEN: ${{ steps.get_runs.outputs.TOKEN }}
+        run: |
+          URL="${{ steps.get_runs.outputs.URL }}"
+          RUN_IDS=($(curl -s -H "Authorization: token $TOKEN" "$URL" | jq -r '.workflow_runs[].id'))
+
+          for run_id in "${RUN_IDS[@]}"; do
+            echo "Deleting run $run_id..."
+            curl -X DELETE -H "Authorization: token $TOKEN" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
+          done
