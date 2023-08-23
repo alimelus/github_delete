@@ -1,9 +1,9 @@
 name: Delete Workflow Runs by Date
 
 on:
-  workflow_run:
-    types:
-      - completed
+  push:
+    branches:
+       hotfix
 
 jobs:
   delete-runs:
