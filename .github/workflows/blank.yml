@@ -15,18 +15,8 @@ jobs:
       - name: Delete Workflow Runs
         id: delete-runs
         run: |
-           OLDER_THAN=$(date -d "1 week ago" +%Y-%m-%dT%H:%M:%SZ)
-
-            # Get list of workflow runs
+           # Get the list of workflow runs
             RUNS=$(curl -s -H "Authorization: token ${{ github.token }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs")
-            
-            # Loop through runs and delete old ones
-            echo $RUNS | jq -c '.workflow_runs[] | select(.created_at < "'$OLDER_THAN'")' | while read -r run; do
-                run_id=$(echo "$run" | jq -r '.id')
-                curl -X DELETE -H "Authorization: token ${{ github.token }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
-                echo "Deleted run $run_id"
-            done
-
      
 
                     
