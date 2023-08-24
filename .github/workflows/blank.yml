@@ -26,3 +26,4 @@ jobs:
            API_URL="https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=100"
            RUNS=$(curl -s "$API_URL")
            echo "$RUNS"
+           WEEK_AGO_RUNS=$(echo "$RUNS" | jq --arg WEEK_AGO "$WEEK_AGO" '.workflow_runs[] | select(.created_at >= $WEEK_AGO) | .id')
