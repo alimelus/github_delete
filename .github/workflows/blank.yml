@@ -31,7 +31,7 @@ jobs:
           echo "WEEK_AGO_RUNS=$WEEK_AGO_RUNS" >> $GITHUB_ENV
 
       - name: Delete Workflow Run
-        if: env.WEEK_AGO_RUNS != ""
+        if: env.WEEK_AGO_RUNS != " "
         run: |
           # Loop through and delete each identified run
           for run_id in $WEEK_AGO_RUNS; do
