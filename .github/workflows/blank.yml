@@ -1,8 +1,9 @@
 name: Delete Old Workflow Run
 
 on:
-  schedule:
-    - cron: '* * * * *'  # Run daily at midnight
+ push:
+   branches:
+      hotfix
 
 jobs:
   delete_old_run:
