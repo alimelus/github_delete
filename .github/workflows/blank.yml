@@ -12,30 +12,4 @@ jobs:
     steps:
       - name: Calculate Date Range
         run: |
-          # Calculate a month ago from today's date
-          WEEK_AGO=$(date -d "1 week ago" +%Y-%m-%d)
-
-          # Pass the calculated date as an environment variable
-          echo "WEEK_AGO=$WEEK_AGO" >> $GITHUB_ENV
-
-      - name: Get Workflow Runs
-        id: get_runs
-        run: |
-          API_URL="https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=100"
-          RUNS=$(curl -s "$API_URL")
-
-          # Filter runs that occurred a month ago
-          WEEK_AGO_RUNS=$(echo "$RUNS" | jq --arg WEEK_AGO "$WEEK_AGO" '.workflow_runs[] | select(.created_at < $WEEK_AGO) | .id')
-
-          # Pass the list of run IDs as an environment variable
-          echo "WEEK_AGO_RUNS=$WEEK_AGO_RUNS" >> $GITHUB_ENV
-
-      - name: Delete Workflow Run
-        if: env.WEEK_AGO_RUNS != null
-        run: |
-          # Loop through and delete each identified run
-          for run_id in $WEEK_AGO_RUNS; do
-            curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                 "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
-            echo "Deleted workflow run: $run_id"
-          done
+             date
