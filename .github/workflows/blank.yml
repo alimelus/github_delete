@@ -17,8 +17,7 @@ jobs:
         id: get_runs
         run: |
           TOKEN="${{ secrets.TOKEN }}"
-          REPO="${{ github.repository }}"
-          CREATED_DATE="2023-08-16THH:MM:SSZ"  # Replace with the desired date
+          CREATED_DATE="2023-08-16"  # Replace with the desired date
 
           URL="https://api.github.com/repos/${{ github.repository }}/actions/runs?event=workflow_run&created=$CREATED_DATE"
 
