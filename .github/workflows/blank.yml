@@ -1,37 +1,40 @@
-name: Delete Workflow Runs by Date
+name: Delete Old Workflow Run
 
 on:
-  push:
-    branches:
-       hotfix
+  schedule:
+    - cron: '* * * * *'  # Run daily at midnight
 
 jobs:
-  delete-runs:
+  delete_old_run:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out the repository
-        uses: actions/checkout@v2
+      - name: Calculate Date Range
+        run: |
+          # Calculate a month ago from today's date
+          WEEK_AGO=$(date -d "1 week ago" +%Y-%m-%d)
+
+          # Pass the calculated date as an environment variable
+          echo "WEEK_AGO=$WEEK_AGO" >> $GITHUB_ENV
 
       - name: Get Workflow Runs
         id: get_runs
         run: |
-          TOKEN="${{ secrets.TOKEN }}"
-          CREATED_DATE="2023-08-23"  # Replace with the desired date
+          API_URL="https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=100"
+          RUNS=$(curl -s "$API_URL")
 
-          URL="https://api.github.com/repos/${{ github.repository }}/actions/runs?event=workflow_run&created=$CREATED_DATE"
+          # Filter runs that occurred a month ago
+          WEEK_AGO_RUNS=$(echo "$RUNS" | jq --arg WEEK_AGO "$WEEK_AGO" '.workflow_runs[] | select(.created_at < $WEEK_AGO) | .id')
 
-          echo "::set-output name=URL::$URL"
-          echo "::set-output name=TOKEN::$TOKEN"
+          # Pass the list of run IDs as an environment variable
+          echo "WEEK_AGO_RUNS=$WEEK_AGO_RUNS" >> $GITHUB_ENV
 
       - name: Delete Workflow Run
-        env:
-          TOKEN: ${{ steps.get_runs.outputs.TOKEN }}
+        if: env.WEEK_AGO_RUNS != ""
         run: |
-          URL="${{ steps.get_runs.outputs.URL }}"
-          RUN_IDS=($(curl -s -H "Authorization: token $TOKEN" "$URL" | jq -r '.workflow_runs[].id'))
-
-          for run_id in "${RUN_IDS[@]}"; do
-            echo "Deleting run $run_id..."
-            curl -X DELETE -H "Authorization: token $TOKEN" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
+          # Loop through and delete each identified run
+          for run_id in $WEEK_AGO_RUNS; do
+            curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                 "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
+            echo "Deleted workflow run: $run_id"
           done
