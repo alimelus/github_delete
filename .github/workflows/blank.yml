@@ -16,3 +16,4 @@ jobs:
              # Calculate the date 1 week ago
              THRESHOLD=$(date -u -d "7 days ago" +"%Y-%m-%dT%H:%M:%SZ")
              echo "THRESHOLD=$THRESHOLD" >> $GITHUB_ENV
+             echo $GITHUB_ENV
