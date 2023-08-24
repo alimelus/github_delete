@@ -28,4 +28,4 @@ jobs:
      
            WEEK_AGO_RUNS=$(echo "$RUNS" | jq --arg WEEK_AGO "$WEEK_AGO" '.workflow_runs[] | select(.created_at >= $WEEK_AGO) | .id')
 
-           echo "WEEK_AGO_RUNS=$WEEK_AGO_RUNS" >> $GITHUB_ENV
+           echo "WEEK_AGO_RUNS: $WEEK_AGO_RUNS
