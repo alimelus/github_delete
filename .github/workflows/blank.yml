@@ -13,3 +13,6 @@ jobs:
       - name: Calculate Date Range
         run: |
              date
+             # Calculate the date 1 week ago
+             threshold_date=$(date -d "1 week ago" +"%Y-%m-%d")
+             echo "THRESHOLD=$THRESHOLD" >> $GITHUB_ENV
