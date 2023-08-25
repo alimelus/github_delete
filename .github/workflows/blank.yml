@@ -27,3 +27,11 @@ jobs:
            RUNS=$(curl -s "$API_URL")
            WEEK_AGO_RUNS=$(echo "$RUNS" | jq --arg WEEK_AGO "$WEEK_AGO" '.workflow_runs[] | select(.created_at >= $WEEK_AGO) | .id')
            echo "One week ago: $WEEK_AGO_RUNS"
+
+       - name: Delete Workflow Runs  
+         run: |
+          for run_id in $WEEK_AGO_RUNS; do
+            curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                 "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
+            echo "Deleted workflow run: $run_id"
+          done
