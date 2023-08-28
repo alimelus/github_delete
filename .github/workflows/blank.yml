@@ -12,22 +12,48 @@ jobs:
     steps:
        - name: Set Date Environment Variable
          run: |
-          # display current date
-          date
-          # Calculate day ago from today's date
-          DAY_AGO=$(date -u -d "1 day ago" +"%Y-%m-%dT%H:%M:%SZ")
-          echo "DAY_AGO=$DAY_AGO" >> $GITHUB_ENV
-
-       - name: Display Calculated Date
-         run: |
-          echo "One day ago: $DAY_AGO"
-    
-       - name: Get Workflow Runs
-         id: get_runs
-         run: |
-             # Fetch workflow run IDs using jq and curl
-               workflow_run_ids=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs" | jq -r ".workflow_runs[].id")
-               echo workflow_run_ids: $workflow_run_ids
+           # Initialize an empty array to store workflow run IDs
+             workflow_run_ids=()
              
+             # Initial page number
+             page=1
+
+            # display current date
+            date
+            # Calculate day ago from today's date
+            DAY_AGO=$(date -u -d "1 day ago" +"%Y-%m-%dT%H:%M:%SZ")
+            echo "DAY_AGO=$DAY_AGO" >> $GITHUB_ENV
+
+
+            while true; do
+             # Fetch workflow run IDs for the current page
+             response=$(curl -s -H "Authorization: Bearer $ACCESS_TOKEN" "https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=100&page=$page")
+           
+             # Extract and append workflow run IDs to the array
+             ids=$(echo "$response" | jq -r ".workflow_runs[].id")
+             if [ -z "$ids" ]; then
+               break
+             fi
+             workflow_run_ids+=($ids)
+           
+             # Move to the next page
+             page=$((page + 1))
+           done
+           
+           # Count the total number of fetched workflow run IDs
+           total_ids=${#workflow_run_ids[@]}
+           
+           # Print the workflow run IDs and the total count
+           for workflow_run_id in "${workflow_run_ids[@]}"; do
+             echo "Workflow run ID: $workflow_run_id"
+           done
+           
+           echo "Total Workflow Run IDs: $total_ids"
+
+
+
+
+
+      
   
  
