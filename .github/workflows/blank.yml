@@ -32,7 +32,8 @@ jobs:
 
        - name: Delete Workflow Runs  
          run: |
+            for workflow_run_id in $DAY_AGO_RUNS; do
             curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                 "https://api.github.com/repos/${{ github.repository }}/actions/runs/$DAY_AGO_RUNS"
-            echo "Deleted workflow run: $DAY_AGO_RUNS"
+                 "https://api.github.com/repos/${{ github.repository }}/actions/runs/$workflow_run_id"
+            done
           
