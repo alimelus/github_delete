@@ -29,12 +29,9 @@ jobs:
            RUNS=$(curl -s "$API_URL")
            DAY_AGO_RUNS=$(echo "$RUNS" | jq --arg DAY_AGO "$DAY_AGO" '.workflow_runs[] | select(.created_at > $DAY_AGO) | .id')
            echo "One week ago: $DAY_AGO_RUNS"
-            for workflow_run_id in $DAY_AGO_RUNS; do
-            created_at=$(curl -s -H "Authorization: ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$workflow_run_id" | jq -r ".created_at")
-            if [[ "$created_at" < "$DATE_ONE_DAY_AGO" ]]; then
             curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                 "https://api.github.com/repos/${{ github.repository }}/actions/runs/$workflow_run_id"
-                 echo "Deleted workflow run $workflow_run_id"
+                 "https://api.github.com/repos/${{ github.repository }}/actions/runs/$DAY_AGO_RUNS"
+                 echo "Deleted workflow run $DAY_AGO_RUNS"
              fi
             done
 
