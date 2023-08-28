@@ -21,23 +21,18 @@ jobs:
        - name: Display Calculated Date
          run: |
           echo "One day ago: $DAY_AGO"
-
-          
-
+    
        - name: Get Workflow Runs
          id: get_runs
          run: |
-             API_URL="https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=10"
-             RUNS=$(curl -s "$API_URL")
-             DAY_AGO_RUNS=$(echo "$RUNS" | jq --arg DAY_AGO "$DAY_AGO" '.workflow_runs[] | select(.created_at > $DAY_AGO) | .id')
-             echo "One week ago: $DAY_AGO_RUNS"
-              curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                   "https://api.github.com/repos/${{ github.repository }}/actions/runs/$DAY_AGO_RUNS"
-                   echo "Deleted workflow run $DAY_AGO_RUNS"
-               fi
-              done
-
-
-         
+             # Fetch workflow run IDs using jq and curl
+               workflow_run_ids=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs" | jq -r ".workflow_runs[].id")
+               
+               # Loop through the IDs and delete the workflow runs
+               for workflow_run_id in $workflow_run_ids; do
+                 curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$workflow_run_id"
+                 echo "Deleted workflow run $workflow_run_id"
+               done
+                        
   
  
