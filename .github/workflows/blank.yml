@@ -12,6 +12,8 @@ jobs:
     steps:
        - name: Set Date Environment Variable
          run: |
+          # display current date
+          
           # Calculate day ago from today's date
           DAY_AGO=$(date -u -d "1 day ago" +"%Y-%m-%dT%H:%M:%SZ")
           echo "DAY_AGO=$DAY_AGO" >> $GITHUB_ENV
