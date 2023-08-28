@@ -27,14 +27,7 @@ jobs:
        - name: Get Workflow Runs
          id: get_runs
          run: |
-            # Get the list of completed workflow runs and sort them by creation date
-              workflow_runs=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/workflows/github_delete/runs?status=completed" | jq '.workflow_runs | sort_by(.created_at) | reverse')
-   
-            # Get the ID of the previous workflow run (the second one in the sorted list)
-            previous_run_id=$(echo "$workflow_runs" | jq -r '.[1].id')
-            
-            echo "Previous workflow run ID: $previous_run_id"
-             API_URL="https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=100"
+             API_URL="https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=10"
              RUNS=$(curl -s "$API_URL")
              DAY_AGO_RUNS=$(echo "$RUNS" | jq --arg DAY_AGO "$DAY_AGO" '.workflow_runs[] | select(.created_at > $DAY_AGO) | .id')
              echo "One week ago: $DAY_AGO_RUNS"
