@@ -12,25 +12,25 @@ jobs:
     steps:
        - name: Set Date Environment Variable
          run: |
-          # Calculate a week ago from today's date
-          WEEK_AGO=$(date -u -d "7 days ago" +"%Y-%m-%dT%H:%M:%SZ")
-          echo "WEEK_AGO=$WEEK_AGO" >> $GITHUB_ENV
+          # Calculate day ago from today's date
+          DAY_AGO=$(date -u -d "1 day ago" +"%Y-%m-%dT%H:%M:%SZ")
+          echo "DAY_AGO=$DAY_AGO" >> $GITHUB_ENV
 
        - name: Display Calculated Date
          run: |
-          echo "One week ago: $WEEK_AGO"
+          echo "One day ago: $DAY_AGO"
 
        - name: Get Workflow Runs
          id: get_runs
          run: |
            API_URL="https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=100"
            RUNS=$(curl -s "$API_URL")
-           WEEK_AGO_RUNS=$(echo "$RUNS" | jq --arg WEEK_AGO "$WEEK_AGO" '.workflow_runs[] | select(.created_at > $WEEK_AGO) | .id')
-           echo "One week ago: $WEEK_AGO_RUNS"
+           DAY_AGO_RUNS=$(echo "$RUNS" | jq --arg DAY_AGO "$DAY_AGO" '.workflow_runs[] | select(.created_at > $DAY_AGO) | .id')
+           echo "One week ago: $DAY_AGO_RUNS"
 
        - name: Delete Workflow Runs  
          run: |
-          for run_id in $WEEK_AGO_RUNS; do
+          for run_id in $DAY_AGO_RUNS; do
             curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
                  "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
             echo "Deleted workflow run: $run_id"
