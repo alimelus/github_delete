@@ -27,7 +27,7 @@ jobs:
          run: |
              # Fetch workflow run IDs using jq and curl
                workflow_run_ids=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs" | jq -r ".workflow_runs[].id")
-               
+               echo workflow_run_ids: $workflow_run_ids
              
   
  
