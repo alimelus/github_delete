@@ -19,6 +19,11 @@ jobs:
 
             workflow_run_ids=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs" | jq --arg date "$DATE_ONE_WEEK_AGO" -r '.workflow_runs[] | select(.created_at < $date) | .id')
             echo workflow_run_ids: $workflow_run_ids
+
+            for workflow_run_id in $workflow_run_ids; do
+            curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$workflow_run_id"
+            echo "Deleted workflow run: $workflow_run_id"
+            done
              
                         
 
