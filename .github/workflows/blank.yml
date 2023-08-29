@@ -13,7 +13,7 @@ jobs:
          run: |
             # display current date
             date
-            EXACT_DATE="2023-08-016T02:11:00Z" 
+            EXACT_DATE="Aug 29 02:59:15 UTC 2023" 
 
             # Fetch workflow run IDs for the exact date
             workflow_run_ids=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs" | jq --arg date "$EXACT_DATE" -r '.workflow_runs | map(select(.created_at == $date)) | .[].id')
