@@ -26,11 +26,12 @@ jobs:
 
       - name: Delete Workflow Runs
         run: |
-          for id in ${{ steps.fetch-ids.outputs.workflow-run-ids }}; do
-            curl -X DELETE \
-              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-              "https://api.github.com/repos/${{ github.repository }}/actions/runs/$id"
-          done
+            for id in ${{ steps.fetch-ids.outputs.workflow-run-ids }}; do
+              response=$(curl -X DELETE \
+                -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                "https://api.github.com/repos/${{ github.repository }}/actions/runs/$id")
+              echo "Deleted workflow run $id - Response: $response"
+            done
 
 
           
