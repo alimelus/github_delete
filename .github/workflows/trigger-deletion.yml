@@ -1,0 +1,24 @@
+name: Trigger Deletion Workflow
+
+on:
+  workflow_dispatch: 
+    inputs:
+      days-ago:
+        description: 'Number of days ago for deletion'
+        required: true
+        
+jobs:
+  delete-workflow-runs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Calculate Date
+        run: |
+          DATE_ONE_WEEK_AGO=$(date -u -d '-${{ github.event.inputs.days-ago }} days' +"%Y-%m-%dT%H:%M:%SZ")
+
+      - name: Fetch Workflow Run IDs
+        id: fetch-ids
+        run: |
+          workflow_run_ids=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs" | jq --arg date "$DATE_ONE_WEEK_AGO" -r '.workflow_runs[] | select(.created_at < $date) | .id')
+            echo workflow_run_ids: $workflow_run_ids
+
+     
