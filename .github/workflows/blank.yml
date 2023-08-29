@@ -17,7 +17,7 @@ jobs:
             DATE_TWO_WEEKS_AGO=$(date -u -d "2 weeks ago" +"%Y-%m-%dT%H:%M:%SZ")
             echo "DATE_TWO_WEEKS_AGO=$DATE_TWO_WEEKS_AGO" >> $GITHUB_ENV
 
-            workflow_run_ids=$(curl -s -H "Authorization: Bearer $ACCESS_TOKEN" "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/actions/runs" | jq --arg date "$DATE_TWO_WEEKS_AGO" -r '.workflow_runs[] | select(.created_at < $date) | .id')
+            workflow_run_ids=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs" | jq --arg date "$DATE_TWO_WEEKS_AGO" -r '.workflow_runs[] | select(.created_at < $date) | .id')
 
             echo workflow_run_ids: $workflow_run_ids
 
