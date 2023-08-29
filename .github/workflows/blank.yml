@@ -13,28 +13,6 @@ jobs:
          run: |
             # display current date
             date
-            EXACT_DATE="Aug 29 02:59:15 UTC 2023" 
-
-            # Fetch workflow run IDs for the exact date
-            workflow_run_ids=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs" | jq --arg date "$EXACT_DATE" -r '.workflow_runs | map(select(.created_at == $date)) | .[].id')
-            
-            # Loop through and delete the fetched workflow run IDs
-            for workflow_run_id in $workflow_run_ids; do
-              curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$workflow_run_id"
-              echo "Deleted workflow run $workflow_run_id"
-            done
-                          
-              # Check if the .workflow_runs array is not empty
-              if [[ $(echo "$response" | jq -r '.workflow_runs | length') -gt 0 ]]; then
-                workflow_run_ids=($(echo "$response" | jq --arg date "$DATE_TWO_WEEKS_AGO" -r '.workflow_runs | map(select(.created_at < $date)) | .[].id'))
-              fi
-              
-              # Loop through and delete the fetched workflow run IDs
-              for workflow_run_id in "${workflow_run_ids[@]}"; do
-                curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$workflow_run_id"
-                echo "Deleted workflow run $workflow_run_id"
-              done
-
-      
-  
+            DATE_TWO_WEEKS_AGO=$(date -u -d "2 weeks ago" +"%Y-%m-%dT%H:%M:%SZ")
+            echo DATE_TWO_WEEKS_AGO: $DATE_TWO_WEEKS_AGO
  
