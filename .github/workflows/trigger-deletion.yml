@@ -14,7 +14,8 @@ jobs:
       - name: Calculate Date
         run: |
           DATE_ONE_WEEK_AGO=$(date -u -d '-${{ github.event.inputs.days-ago }} days' +"%Y-%m-%dT%H:%M:%SZ")
-
+          echo DATE_ONE_WEEK_AGO: $DATE_ONE_WEEK_AGO
+          
       - name: Fetch Workflow Run IDs
         id: fetch-ids
         run: |
