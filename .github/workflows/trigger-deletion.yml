@@ -26,12 +26,11 @@ jobs:
           RUNS=$(curl -s "$API_URL")
 
           # Filter runs older than the specified time threshold
-          OLDER_RUNS=$(echo "$RUNS" | jq --arg THRESHOLD "$THRESHOLD" '.workflow_runs[] | select(.created_at < $THRESHOLD) | .id')
-
-          # Pass the list of run IDs as an environment variable
-          echo "OLDER_RUNS=$OLDER_RUNS" >> $GITHUB_ENV
+          OLDER_RUNS=$(echo "$RUNS" | jq --arg THRESHOLD "$THRESHOLD" '.workflow_runs[] | select(.created_at <= $THRESHOLD) | .id')
 
       - name: Display OLDER_RUNS
         run: |
-          # Display the value of OLDER_RUNS in the workflow log
-          echo "OLDER_RUNS: $OLDER_RUNS"
+          # Loop through and display each identified run using echo
+          for run_id in $OLDER_RUNS; do
+            echo "OLDER_RUN: $run_id"
+          done
