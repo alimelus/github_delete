@@ -3,7 +3,7 @@ name: Delete Old Workflow Run
 on:
  push:
    branches:
-      test
+      xml
 
 jobs:
   delete_old_run:
