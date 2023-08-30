@@ -17,6 +17,7 @@ jobs:
           # Calculate the time threshold (minutes ago)
           MINUTES_AGO=$((${{ github.event.inputs.minutes_ago }} * 60)) # Convert to seconds
           THRESHOLD=$(date -u -d "@$(( $(date +%s) - $MINUTES_AGO ))" +"%Y-%m-%dT%H:%M:%SZ")
+          echo THRESHOLD: $THRESHOLD
 
       - name: Get Workflow Runs
         id: get_runs
