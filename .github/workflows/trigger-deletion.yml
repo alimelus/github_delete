@@ -1,0 +1,45 @@
+name: Trigger Deletion Workflow
+
+on:
+  workflow_dispatch: 
+    inputs:
+      days-ago:
+        description: 'Number of days ago for deletion'
+        required: true
+        
+jobs:
+  delete-workflow-runs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Calculate Date
+        id: cal-date
+        run: |
+          DATE_ONE_WEEK_AGO=$(date -u -d '-${{ github.event.inputs.days-ago }} days' +"%Y-%m-%dT%H:%M:%SZ")
+          echo DATE_ONE_WEEK_AGO: $DATE_ONE_WEEK_AGO
+          echo "::set-output name=date::$DATE_ONE_WEEK_AGO"
+      
+      - name: Fetch Workflow Run IDs
+        id: fetch-runs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          response=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/actions/runs")
+          echo "::set-output name=workflow-run-ids::$(echo "$response" | jq --arg date "$(date -d '1 week ago' --utc --iso-8601=seconds)" -r '.workflow_runs | map(select(.created_at < $date)) | .[].id')"
+
+      - name: Delete Workflow Runs
+        id: delete-runs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_IDS: ${{ steps.fetch-runs.outputs.workflow-run-ids }}
+        run: |
+          for id in $RUN_IDS; do
+            echo "Deleting workflow run ID: $id"
+            curl -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$id"
+          done
+
+
+
+          
+      
+
+     
