@@ -28,7 +28,7 @@ jobs:
           # Filter runs older than the specified time threshold
           OLDER_RUNS=$(echo "$RUNS" | jq --arg THRESHOLD "$THRESHOLD" '.workflow_runs[] | select(.created_at < $THRESHOLD) | .id')
 
-          # Pass the list of run IDs as an environment variable
+          # Set the OLDER_RUNS environment variable directly
           echo "OLDER_RUNS=$OLDER_RUNS" >> $GITHUB_ENV
 
       - name: Delete Workflow Runs
@@ -39,4 +39,3 @@ jobs:
                  "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
             echo "Deleted workflow run: $run_id"
           done
-
