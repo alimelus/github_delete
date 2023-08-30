@@ -17,7 +17,6 @@ jobs:
           # Calculate the time threshold (minutes ago)
           MINUTES_AGO=$((${{ github.event.inputs.minutes_ago }} * 60)) # Convert to seconds
           THRESHOLD=$(date -u -d "@$(( $(date +%s) - $MINUTES_AGO ))" +"%Y-%m-%dT%H:%M:%SZ")
-          echo "THRESHOLD=$THRESHOLD" >> $GITHUB_ENV
 
       - name: Get Workflow Runs
         id: get_runs
@@ -27,9 +26,6 @@ jobs:
 
           # Filter runs older than the specified time threshold
           OLDER_RUNS=$(echo "$RUNS" | jq --arg THRESHOLD "$THRESHOLD" '.workflow_runs[] | select(.created_at < $THRESHOLD) | .id')
-
-          # Set the OLDER_RUNS environment variable directly
-          echo "OLDER_RUNS=$OLDER_RUNS" >> $GITHUB_ENV
 
       - name: Delete Workflow Runs
         run: |
