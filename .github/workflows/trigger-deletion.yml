@@ -30,7 +30,10 @@ jobs:
 
       - name: Display OLDER_RUNS
         run: |
-          # Loop through and display each identified run using echo
-          for run_id in $OLDER_RUNS; do
-            echo "OLDER_RUN: $run_id"
-          done
+              # Loop through and display each identified run using echo
+              for run_id in $OLDER_RUNS; do
+                echo "Processing run: $run_id"
+                echo "Command: echo 'OLDER_RUN: $run_id'"
+                echo "----"
+                echo "OLDER_RUN: $run_id"
+              done
