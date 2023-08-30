@@ -1,0 +1,40 @@
+name: Housekeeping
+
+on:
+  push:
+    branches:
+      test
+jobs:
+  housekeeping:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Calculate Date Threshold
+        run: |
+          # Calculate a date threshold (e.g., 7 days ago)
+          THRESHOLD=$(date -u -d "7 days ago" +"%Y-%m-%dT%H:%M:%SZ")
+
+          # Pass the calculated threshold as an environment variable
+          echo "THRESHOLD=$THRESHOLD" >> $GITHUB_ENV
+
+      - name: Get Workflow Runs
+        id: get_runs
+        run: |
+          API_URL="https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=100"
+          RUNS=$(curl -s "$API_URL")
+
+          # Filter runs older than the threshold
+          OLDER_RUNS=$(echo "$RUNS" | jq --arg THRESHOLD "$THRESHOLD" '.workflow_runs[] | select(.created_at < $THRESHOLD) | .id')
+
+          # Pass the list of older run IDs as an environment variable
+          echo "OLDER_RUNS=$OLDER_RUNS" >> $GITHUB_ENV
+
+      - name: Delete Workflow Runs
+        if: env.OLDER_RUNS != ""
+        run: |
+          # Loop through and delete each identified run
+          for run_id in $OLDER_RUNS; do
+            curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                 "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
+            echo "Deleted workflow run: $run_id"
+          done
