@@ -26,12 +26,6 @@ jobs:
 
           # Filter runs older than the specified time threshold
           OLDER_RUNS=$(echo "$RUNS" | jq --arg THRESHOLD "$THRESHOLD" '.workflow_runs[] | select(.created_at < $THRESHOLD) | .id')
+          echo OLDER_RUNS: $OLDER_RUNS
 
-      - name: Delete Workflow Runs
-        run: |
-          # Loop through and delete each identified run using curl
-          for run_id in $OLDER_RUNS; do
-            curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                 "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
-            echo "Deleted workflow run: $run_id"
-          done
+      
