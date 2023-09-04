@@ -22,7 +22,7 @@ jobs:
           RUN_ID="${{ github.event.inputs.run_id }}"
 
           # Construct the URL for deleting the workflow run
-          DELETE_URL="$API_BASE_URL/runs/$RUN_ID"
+          DELETE_URL="$API_BASE_URL/$RUN_ID"
 
           # Send an HTTP DELETE request to delete the run
           curl -X DELETE $DELETE_URL
