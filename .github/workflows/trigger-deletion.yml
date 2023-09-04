@@ -1,30 +1,21 @@
-name: Delete Workflow Run by passing runid as a parameter
+name: Delete Specific Workflow Run
+
 on:
   workflow_dispatch:
     inputs:
-      run_id:
-        description: 'Workflow Run ID to Delete'
+      run-id:
+        description: 'Workflow Run ID to delete'
         required: true
 
 jobs:
-  delete_run:
+  delete-workflow-run:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
       - name: Delete Workflow Run
         run: |
-          # Set the base URL of your workflow management system's API
-          API_BASE_URL="https://api.github.com/repos/${{ github.repository }}/actions/runs"
-
-          # Get the run ID from the workflow_dispatch input
-          RUN_ID="${{ github.event.inputs.run_id }}"
-
-          # Construct the URL for deleting the workflow run
-          DELETE_URL="$API_BASE_URL/$RUN_ID"
-
-          # Send an HTTP DELETE request to delete the run
-           curl -X DELETE \
-              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \ $DELETE_URL
-         
+          run_id=${{ github.event.inputs.run-id }}
+          echo "Deleting workflow run with ID: $run_id"
+          response=$(curl -X DELETE \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id")
+          echo "Deletion Response: $response"
