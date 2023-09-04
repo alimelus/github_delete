@@ -26,8 +26,4 @@ jobs:
 
           # Send an HTTP DELETE request to delete the run
           curl -X DELETE $DELETE_URL
-          if [ $? -eq 0 ]; then
-            echo "Workflow run $RUN_ID deleted successfully."
-          else
-            echo "Failed to delete workflow run $RUN_ID."
-          fi
+         
