@@ -1,5 +1,4 @@
 name: Delete Old Workflow Run
-
 on:
  push:
    branches:
