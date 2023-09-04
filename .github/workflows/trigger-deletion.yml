@@ -25,5 +25,6 @@ jobs:
           DELETE_URL="$API_BASE_URL/$RUN_ID"
 
           # Send an HTTP DELETE request to delete the run
-          curl -X DELETE $DELETE_URL
+           curl -X DELETE \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \ $DELETE_URL
          
