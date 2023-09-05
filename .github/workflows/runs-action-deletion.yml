@@ -13,6 +13,7 @@ jobs:
 
       - name: Delete Action Runs
         run: |
+           set -X
           # Get workflow IDs with status "success"
           workflow_ids=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/workflows" | jq '.workflows[] | select(.state == "success") | .id')
           
