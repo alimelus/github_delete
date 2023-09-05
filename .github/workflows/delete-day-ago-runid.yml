@@ -6,7 +6,6 @@ on:
 jobs:
   delete_old_run:
     runs-on: ubuntu-latest
-
     steps:
        - name: Set Date Environment Variable
          run: |
