@@ -15,4 +15,6 @@ jobs:
 
       - name: Delete Sub Workflow Runs
         run: |
-          gh api repos/$YOUR_USER/$YOUR_REPO/actions/workflows/6087040686/runs
+          gh api repos/alimelus/github_delete/actions/workflows/6087040686/runs
+           env:
+             GH_TOKEN: ${{ GITHUB_TOKEN }}
