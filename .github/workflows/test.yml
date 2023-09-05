@@ -1,5 +1,4 @@
 name: Displaying current and previous workflow run id
-
 on:
   push:
     branches:
