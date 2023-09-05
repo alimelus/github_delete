@@ -1,25 +1,33 @@
+name: Delete specific action 
+on:
+  push:
+    branches:
+       - main
+jobs:
+  delete-action-runs:
+    runs-on: ubuntu-latest
 
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-# Define your GitHub repository and workflow name
-OWNER="yourusername"
-REPO="yourrepository"
-WORKFLOW_NAME="yourworkflowname"
+      - name: Delete Action Runs
+        run: |
 
-# Define your GitHub token (replace with your token)
-GITHUB_TOKEN="yourtoken"
+          WORKFLOW_NAME="Delete Workflow Runs for a Single Action"
 
-# Get the workflow ID by name
-workflow_id=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/$OWNER/$REPO/actions/workflows" | jq -r '.workflows[] | select(.name == "'"$WORKFLOW_NAME"'") | .id')
-
-if [ -n "$workflow_id" ]; then
-  # Get all runs for the workflow
-  run_ids=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/$OWNER/$REPO/actions/workflows/$workflow_id/runs" | jq -r '.workflow_runs[] | .id')
-
-  # Delete each run
-  for run_id in $run_ids; do
-    echo "Deleting run ID $run_id"
-    curl -s -H "Authorization: Bearer $GITHUB_TOKEN" -X DELETE "https://api.github.com/repos/$OWNER/$REPO/actions/runs/$run_id"
-  done
-else
-  echo "Workflow not found."
+          # Get the workflow ID by name
+          workflow_id=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/workflows" | jq -r '.workflows[] | select(.name == "'"$WORKFLOW_NAME"'") | .id')
+          
+          if [ -n "$workflow_id" ]; then
+            # Get all runs for the workflow
+            run_ids=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/workflows/$workflow_id/runs" | jq -r '.workflow_runs[] | .id')
+          
+            # Delete each run
+            for run_id in $run_ids; do
+              echo "Deleting run ID $run_id"
+              curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -X DELETE "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
+            done
+          else
+            echo "Workflow not found."
 fi
