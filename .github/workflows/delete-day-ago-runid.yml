@@ -17,7 +17,6 @@ jobs:
        - name: Display Calculated Date
          run: |
           echo "One day ago: $DAY_AGO"
-    
        - name: Get Workflow Runs
          id: get_runs
          run: |
