@@ -27,5 +27,4 @@ jobs:
                  curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs/$workflow_run_id"
                  echo "Deleted workflow run $workflow_run_id"
                done
-
               
