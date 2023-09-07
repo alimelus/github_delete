@@ -18,7 +18,7 @@ jobs:
             created_at=$(echo "$line" | jq -r '.created_at')
             run_id=$(echo "$line" | jq -r '.id')
             
-            if [[ "$created_at" < "$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ')" ]]; then
+            if [[ "$created_at" < "$(date -u -d `1 day ago` +%Y-%m-%dT%H:%M:%SZ')" ]]; then
               echo "Deleting run ID $run_id"
               curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
                    "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
