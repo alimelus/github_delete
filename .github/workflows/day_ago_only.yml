@@ -15,10 +15,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ONE_HOUR_AGO=$(date -u -d '1 hour ago' +"%Y-%m-%dT%H:%M:%SZ")
+          echo ONE_HOUR_AGO: $ONE_HOUR_AGO
           API_URL="https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=100"
 
           # Fetch workflow runs and delete runs older than one hour ago
           runs=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "$API_URL")
+          echo runs: $runs
           for run in $(echo "$runs" | jq -c '.workflow_runs[] | select(.created_at < "'"$ONE_HOUR_AGO"'")'); do
             run_id=$(echo "$run" | jq -r '.id')
             echo "Deleting run ID $run_id"
