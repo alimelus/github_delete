@@ -2,7 +2,7 @@ name: Delete Old Workflow Run
 on:
  push:
    branches:
-      test
+      yy
 jobs:
   delete_old_run:
     runs-on: ubuntu-latest
