@@ -2,25 +2,25 @@ name: Delete One Day Old Workflow Runs
 
 on:
   push:
-   branches:
-     test
+    branches:
+       test
 jobs:
   delete-runs:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Get Workflow Runs
-        id: get_runs
+      - name: Delete One Day Old Workflow Runs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          ONE_DAY_AGO=$(date -u -d '1 day ago' +"%Y-%m-%dT%H:%M:%SZ")
           API_URL="https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=100"
-          RUNS=$(curl -s "$API_URL")
-          # Filter and delete runs older than one day ago
-          while IFS= read -r line; do
-            created_at=$(echo "$line" | jq -r '.created_at')
-            run_id=$(echo "$line" | jq -r '.id')
-            
-            if [[ "$created_at" < "$(date -u -d `1 day ago` +%Y-%m-%dT%H:%M:%SZ')" ]]; then
-              echo "Deleting run ID $run_id"
-              curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                   "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
-            fi
-            done <<< "$RUNS"
+
+          # Fetch workflow runs and delete runs older than one day ago
+          runs=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "$API_URL")
+          for run in $(echo "$runs" | jq -c '.workflow_runs[] | select(.created_at < "'"$ONE_DAY_AGO"'")'); do
+            run_id=$(echo "$run" | jq -r '.id')
+            echo "Deleting run ID $run_id"
+            curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
+          done
