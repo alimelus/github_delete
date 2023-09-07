@@ -1,0 +1,37 @@
+name: Delete Week Ago Workflow Runs
+
+on:
+  workflow_dispatch:
+    inputs:
+      week_ago_date:
+        description: 'Date for a week ago in ISO 8601 format (YYYY-MM-DD)'
+        required: true
+
+jobs:
+  delete_old_runs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get Workflow Runs
+        id: get_runs
+        run: |
+          API_URL="https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=100"
+          RUNS=$(curl -s "$API_URL")
+
+          # Fetch the input value for the week ago date
+          WEEK_AGO=$(echo "${{ github.event.inputs.week_ago_date }}T00:00:00Z")
+
+          # Filter runs older than the specified week ago date
+          WEEK_AGO_RUNS=$(echo "$RUNS" | jq -r --arg WEEK_AGO "$WEEK_AGO" '.workflow_runs[] | select(.created_at < $WEEK_AGO) | .id' | tr '\n' ' ')
+
+          # Pass the list of run IDs as an environment variable
+          echo "WEEK_AGO_RUNS=$WEEK_AGO_RUNS" >> $GITHUB_ENV
+
+      - name: Delete Workflow Runs
+        run: |
+          # Loop through and delete each identified run using curl
+          for run_id in $WEEK_AGO_RUNS; do
+            curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                 "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
+            echo "Deleted workflow run: $run_id"
+          done
