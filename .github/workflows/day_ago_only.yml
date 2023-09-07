@@ -7,14 +7,12 @@ on:
 jobs:
   delete-runs:
     runs-on: ubuntu-latest
-
     steps:
       - name: Get Workflow Runs
         id: get_runs
         run: |
           API_URL="https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=100"
           RUNS=$(curl -s "$API_URL")
-
           # Filter and delete runs older than one day ago
           while IFS= read -r line; do
             created_at=$(echo "$line" | jq -r '.created_at')
@@ -25,4 +23,4 @@ jobs:
               curl -X DELETE -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
                    "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id"
             fi
-          done <<< "$RUNS"
+            done <<< "$RUNS"
